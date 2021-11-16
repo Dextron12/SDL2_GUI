@@ -1,0 +1,9 @@
+.vscode
+example.exe
+libfreetype-6.dll
+libpng16-16.dll
+Makefile
+SDL2.dll
+SDL2_image.dll
+SDL2_ttf.dll
+zlib1.dll
