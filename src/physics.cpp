@@ -41,7 +41,15 @@ void Events::update(){
         }
 
         //Update keyboard
-        keyboardUpdate(&event);
+        if (event.type == SDL_KEYDOWN){
+            switch (event.key.keysym.sym){
+                case SDLK_ESCAPE:
+                    b_escape = true;
+                    std::cout << "activated escape btn" << std::endl;
+                    break;
+            }
+        }
+
     }
     //Update deltaTime
     LAST = NOW;

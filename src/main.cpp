@@ -25,6 +25,8 @@ int main(int argc, char *argv[]){
         //Stop drawing
         SDL_RenderPresent(scene.renderer);
         scene.events.reset();
+
+        std::cout << scene.events.getDeltaTime() << std::endl;
     }
     return 0;
 
