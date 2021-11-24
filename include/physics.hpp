@@ -20,25 +20,26 @@ class Events{
         bool b_quit;
         bool b_resize;
 
+        //keyboard
+        bool b_lShift;
+        bool b_rShift;
+        bool b_escape;
+        bool b_return;
+        std::string activeChar;
+        char* keyChar; //WARNING: ONLY USED TO STORE event.text.text INPUT, SHOULD NOT BE EXTERNERLY USED. oNLY USED PROVIDED PUBLIC FUNCTIONS!
+
         //mouse
         SDL_Point p_mousePoint;
         bool b_mouseClick1; //Left
         bool b_mouseClick2; //Right
         bool b_mouseClick3; //Middle
 
-        //keyboard
-        const char* c_activeKey;
-        bool b_escape;
-        bool b_enter;
-        bool b_lShift;
-        bool b_rShift;
 
         void keyboardUpdate(SDL_Event* event);
         
     public:
         Events(); // Only required to init deltaTime
         void update();
-        void reset();
 
         //getters
 
@@ -52,13 +53,6 @@ class Events{
         bool mouseBtn1();
         bool mouseBtn2();
         bool mosueBtn3();
-
-        //keyboard
-        const char* pressedKey();
-        bool keyEscape();
-        bool keyEnter();
-        bool keyLShift();
-        bool keyRShift();
 
 
 };

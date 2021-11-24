@@ -19,14 +19,10 @@ int main(int argc, char *argv[]){
         scene.Text(scene.renderer, scene.useFont(), SDL_Rect{80,300}, "Hello World", SDL_Colour{40,60,140,255});
 
         form.update(scene.renderer, scene.useFont(), &scene.events);
-        
-
 
         //Stop drawing
         SDL_RenderPresent(scene.renderer);
-        scene.events.reset();
-
-        std::cout << scene.events.getDeltaTime() << std::endl;
+        //scene.events.reset();
     }
     return 0;
 

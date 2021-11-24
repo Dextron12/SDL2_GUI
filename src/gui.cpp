@@ -24,11 +24,6 @@ GUI::GUI(std::string windowTitle, int width, int height){
     if (renderer == NULL){
         std::cout << "Renderer initialization error: " << SDL_GetError() << std::endl;
     }
-
-    //Init events
-    Events event;
-    event.reset();
-    events = events;
 }
 
 void GUI::loadFont(const char* fontPath, int fontSize){
