@@ -1,82 +1,131 @@
-//A simple GUI header
-//Can render basic shapes (rect, square, circle, line)
-//Render widgets(forms, push button, radio buton, drop downs, msg popups)
-//Author: Dextron12
-//Begin date: 12//11/21
+//GUI Header for SDL2 API
+//Dextron 2022
 
 #pragma once
 
-#include <iostream>
+//DefinES
 
+//SDL2 includes
 #include <SDL2\SDL.h>
 #include <SDL2\SDL_image.h>
 #include <SDL2\SDL_ttf.h>
 
-#include "physics.hpp"
+//standard headers
+#include <iostream>
+
+//Custom headers
+#include <commons.hpp>
+#include <Events.hpp>
+
 
 class Primitives{
     public:
+        //Solids
+        static void FilledRect(SDL_Renderer* renderer, SDL_FRect pos, SDL_Colour colour);
+        static void Line(SDL_Renderer* renderer, SDL_FPoint point1, SDL_FPoint point2, SDL_Colour colour, int thickness=1);
+        static void FilledCircle(SDL_Renderer* renderer, SDL_Colour colour, int x, int y, int radius);
+        static void Text(SDL_Renderer* renderer, SDL_Rect pos, TTF_Font* font, SDL_Colour colour, std::string msg);
+        //Outlines
+        static void Rect(SDL_Renderer* renderer, SDL_FRect rect, SDL_Colour colour);
+        static void Circle(SDL_Renderer* renderer, SDL_Colour colour, int x, int y, int radius);
+
+        //Overloaded int functions
         static void FilledRect(SDL_Renderer* renderer, SDL_Rect pos, SDL_Colour colour);
-        static void LineRect(SDL_Renderer* renderer, SDL_Rect pos, SDL_Colour colour);
-        static void FilledCircle(SDL_Renderer*, int x, int y, int radius, SDL_Colour);
-        static void LineCircle(SDL_Renderer*, int x, int y, int radius, SDL_Color);
-        static void Text(SDL_Renderer* renderer, TTF_Font* font, SDL_Rect pos, std::string msg, SDL_Colour colour);
+        static void Rect(SDL_Renderer* renderer, SDL_Rect rect, SDL_Colour colour);
+        static void Line(SDL_Renderer* renderer, SDL_Point point1, SDL_Point point2, SDL_Colour colour, int thickness=1);
 };
 
-/*class Form: public Primitives{
-    private:
-        bool active;
+//Switches
 
+class rectSwitch{
+    private:
         SDL_Rect pos;
-        SDL_Colour colour;
+        SDL_Colour c_fore, c_back, c_active;
+        bool state; //Global state of switch.
 
-    public:
-        Form(SDL_Rect pos, SDL_Colour colour);
-
-        void update(SDL_Renderer* renderer, TTF_Font* font, Events* event);
-        void setState(bool state);
-};*/
-
-
-
-class GUI: public Primitives{
-    private:
-        int width, height;
-
-        bool programState;
+        //Text
         TTF_Font* font;
+        std::string s_msg;
+    public:
+        rectSwitch(SDL_Rect pos, SDL_Colour back, SDL_Colour fore, SDL_Colour active, TTF_Font* font, std::string msg);
+
+        void update(SDL_Renderer*, Mouse mouse);
+};
+
+class ovalSwitch{
+    private:
+        SDL_Rect pos;
+        SDL_Colour c_fore, c_back, c_active;
+        bool state;
+
+        //Text
+        TTF_Font* font;
+        std::string s_msg;
+        
+        //Borders
+        int radius;
+    public:
+        ovalSwitch(SDL_Rect pos, SDL_Colour back, SDL_Colour fore, SDL_Colour active, TTF_Font* font, std::string msg);
+
+        void update(SDL_Renderer* renderer, Mouse mouse);
+};
+
+//Buttons
+
+class Button{
+    private:
+        bool state;
+
+        //Positioning
+        SDL_Rect pos;
+        
+        //Graphical
+        SDL_Colour c_fore, c_back, c_active;
+        TTF_Font* font;
+        std::string s_msg;
+    public:
+        Button(SDL_Rect pos, SDL_Colour fore, SDL_Colour back, SDL_Colour active, TTF_Font* font, std::string msg);
+
+        void update(SDL_Renderer* renderer, Mouse mouse);
+};
+
+class RndButton{
+    private:
+        bool state;
+
+        //Positioning
+        SDL_Rect pos;
+        
+        //Graphical
+        SDL_Colour c_fore, c_back, c_active;
+        TTF_Font* font;
+        std::string s_msg;
+    public:
+        RndButton(SDL_Rect pos, SDL_Colour fore, SDL_Colour back, SDL_Colour active, TTF_Font* font, std::string msg);
+
+        void update(SDL_Renderer* renderer, Mouse mouse);
+};
+
+class RadButton{
+    private:
+        bool state;
+
+        int x, y, radius;
+        int radius;
+
+        SDL_Colour c_fore, c_back, c_active;
+        TTF_Font* font;
+        std::string s_msg;
 
     public:
-        SDL_Window* window;
-        SDL_Renderer* renderer;
-        Events events;
-        
-        
+        RadButton(int x, int y, int radius, SDL_Colour fore, SDL_Colour back, SDL_Colour active, TTF_Font* font, std::string msg);
 
-        GUI(std::string windowTitle, int width, int height);
-        void createForm(SDL_Rect pos, SDL_Colour colour);
-
-        void loadFont(const char* fontPath, int fontSize);
-        TTF_Font* useFont();
-
-        class Form{
-            private:
-                bool state;
-
-                SDL_Rect pos;
-                SDL_Colour BG;
-                SDL_Colour FG;
-                std::string stateMsg;
-                std::string input;
-
-            public:
-                Form(SDL_Rect pos, SDL_Colour background, SDL_Colour foreground, std::string msg);
-
-                void update(SDL_Renderer* renderer, TTF_Font* font, Events* event);
-
-                //Getters
-                bool getState();
-        };
-        
-
+        void update(SDL_Renderer* renderer, Mouse mouse);
 };
+
+//Forms
+
+
+//Menus
+
+

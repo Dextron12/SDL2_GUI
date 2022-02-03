@@ -1,65 +1,25 @@
-#include "gui.hpp"
+#include <Gui.hpp>
 
-GUI::GUI(std::string windowTitle, int width, int height){
-    //Init SDL2
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0){
-        std::cout << "Failed to init SDL: " << SDL_GetError() << std::endl;
-    }
-    //Init IMG
-    if (IMG_Init(IMG_INIT_PNG) == 0){
-        std::cout << "Failed to init IMG: " << IMG_GetError() << std::endl;
-    }
-    if (TTF_Init() < 0){
-        std::cout << "Failed to init TTF: " << TTF_Init() << std::endl;
-    }
-
-    //Create window
-    window = SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
-    if (window == NULL){
-        std::cout << "Window initialization error: " << SDL_GetError() << std::endl;
-    }
-
-    //Create renderer
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL){
-        std::cout << "Renderer initialization error: " << SDL_GetError() << std::endl;
-    }
-}
-
-void GUI::loadFont(const char* fontPath, int fontSize){
-    TTF_Font* font;
-    font = TTF_OpenFont(fontPath, fontSize);
-    if (!font){
-        std::cout << "Failed to open font: " << TTF_GetError() << std::endl;
-    } else {
-        this->font = font;
-    }
-}
-
-TTF_Font* GUI::useFont(){
-    return font;
-}
-
-void Primitives::FilledRect(SDL_Renderer* renderer, SDL_Rect pos, SDL_Color colour){
-    //Set colour
+void Primitives::FilledRect(SDL_Renderer* renderer, SDL_FRect pos, SDL_Colour colour){
     SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
-    //Draw rect
-    SDL_RenderFillRect(renderer, &pos);
+    SDL_RenderFillRectF(renderer, &pos);
 }
 
-void Primitives::LineRect(SDL_Renderer* renderer, SDL_Rect pos, SDL_Colour colour){
-    //Set Colour
+void Primitives::Rect(SDL_Renderer* renderer, SDL_FRect pos, SDL_Colour colour){
     SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
-    //Draw rect
-    SDL_RenderDrawRect(renderer, &pos);
+    SDL_RenderDrawRectF(renderer, &pos);
 }
 
-void Primitives::FilledCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Colour colour){
+void Primitives::Line(SDL_Renderer* renderer, SDL_FPoint point1, SDL_FPoint point2, SDL_Colour colour, int thickness){
+    SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
+    SDL_RenderDrawLineF(renderer, point1.x, point1.y, point2.x, point2.y);
+}
+
+void Primitives::FilledCircle(SDL_Renderer* renderer, SDL_Colour colour, int x, int y, int radius){
     int offsetx, offsety, d;
-
     offsetx = 0;
     offsety = radius;
-    d = radius -1;
+    d = radius - 1;
 
     SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
 
@@ -69,12 +29,11 @@ void Primitives::FilledCircle(SDL_Renderer* renderer, int x, int y, int radius, 
         SDL_RenderDrawLine(renderer, x - offsetx, y - offsety, x + offsetx, y - offsety);
         SDL_RenderDrawLine(renderer, x - offsety, y - offsetx, x + offsety, y - offsetx);
 
-        if (d >= 2*offsetx){
-            d -= 2*offsetx + 1;
+        if (d >= 2 * offsetx){
+            d -= 2 * offsetx + 1;
             offsetx += 1;
-        } else if ( d < 2 * offsety - 1){
+        } else if (d < 2 * offsety - 1){
             d += 2 * offsety - 1;
-            offsety -= 1;
         } else {
             d += 2 * (offsety - offsetx - 1);
             offsety -= 1;
@@ -83,9 +42,8 @@ void Primitives::FilledCircle(SDL_Renderer* renderer, int x, int y, int radius, 
     }
 }
 
-void Primitives::LineCircle(SDL_Renderer* renderer, int x, int y, int radius, SDL_Colour colour){
+void Primitives::Circle(SDL_Renderer* renderer, SDL_Colour colour, int x, int y, int radius){
     int offsetx, offsety, d;
-
     offsetx = 0;
     offsety = radius;
     d = radius - 1;
@@ -105,7 +63,7 @@ void Primitives::LineCircle(SDL_Renderer* renderer, int x, int y, int radius, SD
         if (d >= 2 * offsetx){
             d -= 2 * offsetx + 1;
             offsetx += 1;
-        } else if (d < 2 * (radius - offsety)){
+        } else if ( d < 2 * (radius - offsety)){
             d += 2 * offsety - 1;
             offsety -= 1;
         } else {
@@ -116,61 +74,218 @@ void Primitives::LineCircle(SDL_Renderer* renderer, int x, int y, int radius, SD
     }
 }
 
-void Primitives::Text(SDL_Renderer* renderer, TTF_Font* font, SDL_Rect pos, std::string msg, SDL_Colour colour){
-    //Create surface
-    SDL_Surface* text = TTF_RenderText_Blended(font, msg.c_str(), colour);
-    //grab width and height and assin to pos
-    pos.w = text->w; pos.h = text->h;
-    //COnvert to surface
-    SDL_Texture* renderText = SDL_CreateTextureFromSurface(renderer, text);
-    //Render text
-    SDL_RenderCopy(renderer, renderText, NULL, &pos);
+void Primitives::Text(SDL_Renderer* renderer, SDL_Rect pos, TTF_Font* font, SDL_Colour colour, std::string msg){
+    SDL_Surface* surface = TTF_RenderText_Blended(font, msg.c_str(), colour);
+    pos.w = surface->w; pos.h = surface->h;
+    SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, surface);
+    //Render Text
+    SDL_RenderCopy(renderer, text, NULL, &pos);
     //Free memory
-    SDL_FreeSurface(text);
-    SDL_DestroyTexture(renderText);
-    
-    
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(text);
 }
 
-GUI::Form::Form(SDL_Rect pos, SDL_Colour background, SDL_Colour foreground, std::string msg){
-    //set state to false.
-    state = false;
+
+//Overloaded Primitive functions
+void Primitives::FilledRect(SDL_Renderer* renderer, SDL_Rect pos, SDL_Colour colour){
+    SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
+    SDL_RenderFillRect(renderer, &pos);
+}
+
+void Primitives::Line(SDL_Renderer* renderer, SDL_Point point1, SDL_Point point2, SDL_Colour colour, int thickness){
+    SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
+    SDL_RenderDrawLine(renderer, point1.x, point1.y, point2.x, point2.y);
+}
+
+
+//Switch Classes
+
+//Rectanglar switch
+rectSwitch::rectSwitch(SDL_Rect pos, SDL_Colour back, SDL_Colour fore, SDL_Colour active, TTF_Font* font, std::string msg){
     this->pos = pos;
-    BG = background;
-    FG = foreground;
-    stateMsg = msg;
+    c_fore = fore;
+    c_back = back;
+    c_active = active;
+    state = false;
+    this->font = font;
+    s_msg = msg;
 }
 
-void GUI::Form::update(SDL_Renderer* renderer, TTF_Font* font, Events* event){
-    Primitives::FilledRect(renderer, pos, BG);
+void rectSwitch::update(SDL_Renderer* renderer, Mouse mouse){
+    //Draw static background
+    Primitives::FilledRect(renderer, pos, c_back);
+    Primitives::FilledCircle(renderer, c_back, pos.x, pos.y, pos.h/2); //Left corner
+    Primitives::FilledCircle(renderer, c_back, pos.x+pos.w, pos.y, pos.h/2); //Right corner
 
-    //Draw text(FG)
-    if (!state || input.size() == 0){
-        //No user input, render default text if any.
-        if (stateMsg.size() > 0){
-            Primitives::Text(renderer, font, SDL_Rect{pos.x+5, pos.y+(pos.h/2)}, stateMsg, FG);
-            //This is doen so users can pass "" as stateMsg.
-        }
-    } else {
-        //There is user input, lets render it
-        Primitives::Text(renderer, font, SDL_Rect{pos.x+5, pos.y+(pos.h/2)}, input, FG);
+    //Draw switch(25% of width of switch) depending on state
+    switch (state){
+        case false:
+            //Draw switch on the left.
+            Primitives::FilledRect(renderer, SDL_Rect{pos.x+5, pos.y+5, pos.w/4, pos.h-10}, c_fore);
+            break;
+        case true:
+            //Draw switch on the right.
+            Primitives::FilledRect(renderer, SDL_Rect{(pos.x+pos.w)-5, pos.y+5, pos.w/4, pos.h-10}, c_active); 
     }
 
-    //Handle user click
-    if ( (pos.x+pos.w >= event->mousePos().x && event->mousePos().x >= pos.x) && (pos.y+pos.h >= event->mousePos().y && event->mousePos().y >= pos.y)){
-        if (event->mouseBtn1() == true){
-            //change state
-            if (state == false){
-                state = true;
-            } else {
-                state = false;
+    //Logic
+    if ( (pos.x+pos.w >= mouse.x && mouse.x >= pos.x) && (pos.y+pos.h >= mouse.y && mouse.y >= pos.y)){
+        if (mouse.button && SDL_BUTTON_LEFT != 0){
+            //change state of switch
+            switch (state){
+                case true:
+                    state = false;
+                    break;
+                case false:
+                    state = true;
+                    break;
             }
         }
     }
+}
 
-    //Get key inout
-    if (state == true){
-        //std::cout << event->pressedKey() << std::endl;
+//Oval switch
+ovalSwitch::ovalSwitch(SDL_Rect pos, SDL_Colour back, SDL_Colour fore, SDL_Colour active, TTF_Font* font, std::string msg){
+    this->pos = pos;
+    c_fore = fore;
+    c_back = back;
+    c_active = active;
+    this->font = font;
+    msg = msg;
+    radius = pos.h/2;
+
+    state = false;
+
+}
+
+void ovalSwitch::update(SDL_Renderer* renderer, Mouse mouse){
+    //Draw static background
+    Primitives::FilledRect(renderer, pos, c_back);
+
+    //Draw switch
+    switch (state){
+        case true:
+            //Draw switch on the right
+            Primitives::FilledCircle(renderer, c_active, (pos.x-radius)-5, pos.y+5, radius);
+            break;
+        case false:
+            //Draw switch on the left
+            Primitives::FilledCircle(renderer, c_fore, pos.x+5, pos.y+5, radius);
+            break;
     }
 
+    //Logic
+    if ( (pos.x+pos.w >= mouse.x && mouse.x >= pos.x) && (pos.y+pos.h >= mouse.y && mouse.y >= pos.y)){
+        if (mouse.button && SDL_BUTTON_LEFT != 0){
+            switch (state){
+                case true:
+                    state = false;
+                    break;
+                case false:
+                    state = true;
+                    break;
+            }
+        }
+    }
+}
+
+
+//Button classes
+
+
+Button::Button(SDL_Rect pos, SDL_Colour back, SDL_Colour fore, SDL_Colour active, TTF_Font* font, std::string msg){
+    this->pos = pos;
+    c_back = back;
+    c_fore = fore;
+    c_active = active;
+    this->font = font;
+    s_msg = msg;
+
+    state = false;
+}
+
+void Button::update(SDL_Renderer* renderer, Mouse mouse){
+    if ( (pos.x+pos.w >= mouse.x && mouse.x >= pos.x) && (pos.y+pos.h >= mouse.y && mouse.y >= pos.y)){
+        if (mouse.button && SDL_BUTTON_LEFT != 0){
+            //Draw active button
+            Primitives::FilledRect(renderer, pos, c_active);
+            //change state
+            switch (state){
+                case true:
+                    state = false;
+                    break;
+                case false:
+                    state = true;
+                    break;
+            }
+        } else {
+            //Draw inactive state
+            Primitives::FilledRect(renderer, pos, c_back);
+        }
+    }
+}
+
+RndButton::RndButton(SDL_Rect pos, SDL_Colour fore, SDL_Colour back, SDL_Colour active, TTF_Font* font, std::string msg){
+    this->pos = pos;
+    c_fore = fore;
+    c_back = back;
+    c_active = active;
+    this->font = font;
+    s_msg = msg;
+
+    state = false;
+}
+
+void RndButton::update(SDL_Renderer* renderer, Mouse mouse){
+    if ( (pos.x+pos.w >= mouse.x && mouse.x >= pos.x) && (pos.y+pos.w >= mouse.y && mouse.y >= pos.y)){
+        //Draw switch
+        Primitives::FilledRect(renderer, pos, c_back);
+        Primitives::FilledCircle(renderer, c_back, pos.x, pos.y, pos.h/2);          //Left border
+        Primitives::FilledCircle(renderer, c_back, pos.x+pos.w, pos.y, pos.h/2);    //Right Border
+        if (mouse.button && SDL_BUTTON_LEFT != 0){
+            //Change state
+            switch (state){
+                case true:
+                    state = false;
+                    break;
+                case false:
+                    state = true;
+                    break;
+            }
+        }
+    } else {
+        Primitives::FilledRect(renderer, pos, c_active);
+        Primitives::FilledCircle(renderer, c_active, pos.x, pos.y, pos.h/2);          //Left border
+        Primitives::FilledCircle(renderer, c_active, pos.x+pos.w, pos.y, pos.h/2);    //Right Border
+    }
+}
+
+RadButton::RadButton(int x, int y, int radius, SDL_Colour fore, SDL_Colour back, SDL_Colour active, TTF_Font* font, std::string msg){
+    this->x = x; this->y = y; this->radius = radius;
+    c_fore = fore;
+    c_back = back;
+    c_active = active;
+    this->font = font;
+    s_msg = msg;
+}
+
+void RadButton::update(SDL_Renderer* renderer, Mouse mouse){
+    //Draw static background
+    Primitives::FilledCircle(renderer, c_back, x, y, radius);
+
+    if ( (x+(radius*2) >= mouse.x && mouse.x >= x) && (y+(radius*2) >= mouse.y && mouse.y >= y)){
+        //Draw active inner circle
+        Primitives::FilledCircle(renderer, c_active, x+4, y+4, radius-8);
+        //Check state
+        if (mouse.button && SDL_BUTTON_LEFT != 0){
+            switch (state){
+                case true:
+                    state = false;
+                    break;
+                case false:
+                    state = true;
+                    break;
+            }
+        }
+    }
 }
