@@ -111,7 +111,6 @@ class RadButton{
         bool state;
 
         int x, y, radius;
-        int radius;
 
         SDL_Colour c_fore, c_back, c_active;
         TTF_Font* font;

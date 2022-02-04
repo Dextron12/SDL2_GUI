@@ -288,4 +288,9 @@ void RadButton::update(SDL_Renderer* renderer, Mouse mouse){
             }
         }
     }
+
+    //Draw inner circle if state is active
+    if (state == true){
+        Primitives::FilledCircle(renderer, c_active, x+4, y+4, radius-8);
+    }
 }
