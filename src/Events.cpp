@@ -48,14 +48,6 @@ void Events::update(){
             }
         }
 
-        //Keybaord Events
-        if (b_logKeys == true){
-            //Enable|Disable using setKeyboardState();
-            if (event.type == SDL_TEXTINPUT){
-                std::cout << event.text.text << std::endl;
-            }
-        }
-
         //Mouse events
         if (event.type == SDL_MOUSEMOTION){
             mouse.button = SDL_GetMouseState(&mouse.x, &mouse.y);
@@ -68,17 +60,9 @@ void Events::update(){
     deltaTime = ((NOW-LAST)/SDL_GetPerformanceFrequency())/1000;
 }
 
-void Events::setKeyboardState(bool state){
-    b_logKeys = state;
-}
-
 
 bool Events::getAppState(){
     return b_quit;
-}
-
-std::string Events::getKeyChar(){
-    return str_key;
 }
 
 SDL_Point Events::mousePos(){

@@ -19,10 +19,6 @@ class Events{
 
         bool b_windowResize, b_quit;
 
-        //Keyboard
-        bool b_logKeys;
-        std::string str_key;
-
         //Mouse
         Mouse mouse;
 
@@ -36,13 +32,11 @@ class Events{
         
         void update();
 
-        void setKeyboardState(bool state);
 
         //Getters
 
         bool getAppState();
         
-        std::string getKeyChar();
 
         SDL_Point mousePos();
         int* mouseState();
