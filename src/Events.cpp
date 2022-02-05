@@ -48,6 +48,21 @@ void Events::update(){
             }
         }
 
+        //Keyboard events
+        //KeyState = const_cast <Uint8*> (SDL_GetKeyboardState(NULL));
+        if (b_textInput == true){
+            if (event.type == SDL_TEXTINPUT){
+                c_textOutput.append(event.text.text);
+            }
+
+            if (event.type == SDL_KEYDOWN){
+                if (event.key.keysym.sym == SDLK_BACKSPACE && c_textOutput.size() > 0){
+                    //Remove char
+                    c_textOutput.erase(c_textOutput.end()-1);
+                }
+            }
+        }
+
         //Mouse events
         if (event.type == SDL_MOUSEMOTION){
             mouse.button = SDL_GetMouseState(&mouse.x, &mouse.y);
@@ -58,6 +73,7 @@ void Events::update(){
     LAST = NOW;
     NOW = SDL_GetPerformanceCounter();
     deltaTime = ((NOW-LAST)/SDL_GetPerformanceFrequency())/1000;
+
 }
 
 
@@ -71,4 +87,16 @@ SDL_Point Events::mousePos(){
 
 int* Events::mouseState(){
     return &mouse.button;
+}
+
+char* Events::getTextOutput(){
+    std::cout << c_textOutput << std::endl;
+}
+
+void Events::clearTextOutput(){
+    c_textOutput.clear();
+}
+
+void Events::startTextInput(bool state){
+    b_textInput = state;
 }

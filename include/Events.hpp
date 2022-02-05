@@ -17,10 +17,16 @@ class Events{
 
         double NOW, LAST;
 
-        bool b_windowResize, b_quit;
+        bool b_windowResize, b_quit, b_textInput;
 
         //Mouse
         Mouse mouse;
+
+        //Keyboard
+        Uint8* KeyState; //Current Key state
+        Uint8* KeyStore; // Last frame key state
+        std::string c_textOutput; //Extraction of text when taking textInput.
+
 
     public:
         float deltaTime;
@@ -36,6 +42,10 @@ class Events{
         //Getters
 
         bool getAppState();
+
+        char* getTextOutput();
+        void clearTextOutput();
+        void startTextInput(bool state);
         
 
         SDL_Point mousePos();
