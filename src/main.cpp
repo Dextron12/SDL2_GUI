@@ -1,23 +1,14 @@
-#include <iostream>
-
-#define SDL_MAIN_HANDLED
-
-#include <SDL2/SDL.h>
-
-#include "Events.hpp"
+#include "gui.hpp"
 
 int main(int argc, char* argv[]){
-    Events event(800, 600, "test");
+    Scene scene(800, 600, "test");
 
-    event.startTextInput(true);
+    while (scene.events.appState){
+        scene.events.update();
 
-    while (!event.getAppState()){
-        event.update();
-        SDL_SetRenderDrawColor(event.renderer, 140,140,140,255);
-        SDL_RenderClear(event.renderer);
+        SDL_SetRenderDrawColor(scene.renderer, 39, 58, 93, 255);
+        SDL_RenderClear(scene.renderer);
 
-        SDL_RenderPresent(event.renderer);
+        SDL_RenderPresent(scene.renderer);
     }
-
-    return 0;
 }
