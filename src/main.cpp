@@ -16,8 +16,6 @@ int main(int argc, char* argv[]){
         SDL_SetRenderDrawColor(event.renderer, 140,140,140,255);
         SDL_RenderClear(event.renderer);
 
-        event.getTextInput();
-
         SDL_RenderPresent(event.renderer);
     }
 

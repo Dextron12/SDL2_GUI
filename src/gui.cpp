@@ -294,3 +294,90 @@ void RadButton::update(SDL_Renderer* renderer, Mouse mouse){
         Primitives::FilledCircle(renderer, c_active, x+4, y+4, radius-8);
     }
 }
+
+
+//Form class
+
+Form::Form(SDL_Rect pos, SDL_Colour Fore, SDL_Colour Back, SDL_Colour textColour, TTF_Font* font){
+    state = false; // Deactivates text reciver on init
+    this->pos = pos;
+
+    c_fore = Fore;
+    c_back = Back;
+    c_text = textColour;
+    this->font = font;
+}
+
+void Form::update(SDL_Renderer* renderer, std::string keyInput){
+    //Draw background first.
+    Primitives::FilledRect(renderer, pos, c_back);
+
+    //Manually draw Text(due to precise positioning its bette rto manually do it)
+    //Set render colour of text.
+    SDL_SetRenderDrawColor(renderer, c_text.r, c_text.g, c_text.b, c_text.a);
+    //Render inactive text if no keyInfo provided.
+    if (keyInput.size() == 0){
+        //No input detected, render inactive text
+    }
+    SDL_Surface* textSurface = TTF_RenderText_Blended(font, keyInput.c_str(), c_text);
+    posText.w = textSurface->w; posText.h = textSurface->h;
+    //Convert to texture
+    SDL_Texture* text = SDL_CreateTextureFromSurface(renderer, textSurface);
+    //Draw and position text
+    switch (pos_text){
+        case Outer_Left:
+            //Offset text before pos.x
+            posText.x = pos.x-posText.w-10;
+            posText.y = pos.y+(pos.h/2)-posText.h;
+            //Render
+            SDL_RenderCopy(renderer, text, NULL, &posText);
+            break;
+        case Outer_Right:
+            //Offset text after pos.x+pos.w
+            posText.x = pos.x+pos.w+posText.w+10;
+            posText.y = pos.y+(pos.h/2)-posText.h;
+            //Render
+            SDL_RenderCopy(renderer, text, NULL, &posText);
+            break;
+        case Top:
+            //Allign to top center of form.
+            posText.x = pos.x+((pos.w/2)-(posText.w/2));
+            posText.y = pos.y-posText.h-10;
+            //Render
+            SDL_RenderCopy(renderer, text, NULL, &posText);
+            break;
+        case Bottom:
+            //Allin center bottom.
+            posText.x = pos.x+(pos.w/2)-(posText.w/2);
+            posText.y = pos.x+pos.h+posText.h+10;
+            //Render
+            SDL_RenderCopy(renderer, text, NULL, &posText);
+            break;
+
+        case Inner_Left:
+            //10px in from left border
+            posText.x = pos.x+10;
+            posText.y = pos.y+(pos.h/2)-posText.h;
+            //Render
+            SDL_RenderCopy(renderer, text, NULL, &posText);
+            break;
+        case Centered:
+            //align with center of form.
+            posText.x = pos.x+(pos.w/2)-(posText.w/2);
+            posText.y = pos.y+(pos.h/2)-(posText.h/2);
+            //Render
+            SDL_RenderCopy(renderer, text, NULL, &posText);
+            break;
+        case Inner_Right:
+            //align end of text to 10px before right border.
+            posText.x = pos.x+(pos.w-posText.w-10);
+            posText.y = pos.y+(pos.h/2)+(posText.y/2);
+            //Render
+            SDL_RenderCopy(renderer, text, NULL, &posText);
+            break;
+    }
+    //Free text memory
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(text);
+
+}

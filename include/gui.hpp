@@ -124,6 +124,40 @@ class RadButton{
 
 //Forms
 
+enum textPos{
+    Outer_Left,
+    Outer_Right,
+    Top,
+    Bottom,
+
+    //Inner text positions
+    Inner_Left,
+    Centered,
+    Inner_Right
+};
+
+class Form{
+    private:
+        bool state;
+
+        //Logic vars
+        SDL_Rect pos;
+
+        //Graphical vars
+        TTF_Font* font;
+        SDL_Colour c_fore, c_back, c_text;
+        textPos pos_text;
+        SDL_Rect posText; //Coords for text.
+
+
+    public:
+        Form(SDL_Rect pos, SDL_Colour Fore, SDL_Color Back, SDL_Colour textColour, TTF_Font* font);
+
+        void update(SDL_Renderer* renderer, std::string keyInput);
+
+        //Flag functions
+};
+
 
 //Menus
 

@@ -100,3 +100,4 @@ void Events::clearTextOutput(){
 void Events::startTextInput(bool state){
     b_textInput = state;
 }
+
