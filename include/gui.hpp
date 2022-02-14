@@ -6,6 +6,9 @@
 //CPP Includes
 #include <iostream>
 
+//C headers
+#include <string.h>
+
 //SDL2 Includes
 #include <SDL2\SDL.h>
 #include <SDL2\SDL_image.h>
@@ -28,6 +31,11 @@ class Primitives{
         static void Line(SDL_Renderer* renderer, SDL_Point point1, SDL_Point point2, SDL_Colour colour, int thickness=1);
 };
 
+enum keyboardType{
+    EVENT_KEYBOARD,
+    GLOBAL_KEYBOARD,
+    INACTIVE_KEYBOARD
+};
 
 class Scene{
     public:
@@ -41,12 +49,20 @@ class Scene{
         SDL_Point mousePos;
         Uint32 mouseButtons;
 
+        //keyboard
+        keyboardType keyType = EVENT_KEYBOARD;
+        std::string keyInput;
+        //Event state keyboard
+        unsigned int keyMap[255][3];
+
         bool appState;
 
         Scene(int width, int height, const char* Title);
 
 
 };
+
+
 
 class Events{
     private:
@@ -80,7 +96,7 @@ enum textAlignment{
 
 //Switches
 class Switch{
-    private:
+    protected:
         textAlignment textAlign;
         
         SDL_Rect pos, textPos;
@@ -104,7 +120,19 @@ class Switch{
 class OvalSwitch: Switch{
     public:
         void Render(SDL_Renderer* renderer);
-}
+};
+
+class RadioBtn: Switch{
+    public:
+        void Render(SDL_Renderer* renderer);
+};
+
+class Button: Switch{
+    public:
+        void Render(SDL_Renderer* renderer);
+};
+
+
 
 
 

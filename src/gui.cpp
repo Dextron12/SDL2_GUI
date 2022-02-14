@@ -62,6 +62,20 @@ void Events::update(Scene* scene) {
             scene->mouseButtons = SDL_GetMouseState(&scene->mousePos.x, &scene->mousePos.y);
         }
 
+        //Keyboard
+
+        //Detect which key detection is required
+        if (scene->keyType == GLOBAL_KEYBOARD){
+            if (event.type == SDL_TEXTINPUT){
+                scene->keyInput.append(event.text.text);
+            }
+        }
+        if (scene->keyType == EVENT_KEYBOARD){
+            //Reset keMap each frame to 0
+            memset(scene->keyMap, 0, sizeof(scene->keyMap));
+            std::cout << scene->keyMap[4][4] << std::endl;
+        }
+
 
     }
     //Update deltaTime
@@ -220,6 +234,8 @@ void Switch::Render(SDL_Renderer* renderer){
 }
 
 void Switch::RenderText(SDL_Renderer* renderer){
+    //0. Set text colour
+    SDL_SetRenderDrawColor(renderer, c_Fore.r, c_Fore.g, c_Fore.b, 255);
     //1. Create a surface, fill with text
     SDL_Surface* textSurface = TTF_RenderText_Blended(font, text, c_Fore);
     //2. Get textSurface width & height.
@@ -258,4 +274,46 @@ void Switch::RenderText(SDL_Renderer* renderer){
 void OvalSwitch::Render(SDL_Renderer* renderer){
     //Draw background
     Primitives::FilledRect(renderer, pos, c_Back);
+    //Draw Left border
+    Primitives::FilledCircle(renderer, c_Back, pos.x, pos.y+(pos.h/2), pos.h/2);
+    //Right border
+    Primitives::FilledCircle(renderer, c_Back, pos.x+pos.w, pos.y+(pos.h/2), pos.h/2);
+
+    //Circle Slider
+    if (state == true){
+        Primitives::FilledCircle(renderer, c_Active, pos.x+pos.w-(pos.h/2)-5, pos.y+5, pos.h/2);
+    } else {
+        Primitives::FilledCircle(renderer, c_Fore, pos.x+5, pos.y+5, (pos.h/2)-2);
+    }
+
+    RenderText(renderer);
 }
+
+void RadioBtn::Render(SDL_Renderer* renderer){
+    //Draw bg
+    Primitives::FilledCircle(renderer, c_Back, pos.x, pos.y, pos.w/2);
+
+    //Draw inner circle
+    if (state){
+        Primitives::FilledCircle(renderer, c_Active, pos.x+2, pos.y+2, (pos.w/2)-4);
+    } // Don't draw an inner circle if state inactive
+
+    //Check if end-user wants text inside button. Change to outter left if so...
+    if (textAlign == I_LEFT || textAlign == I_RIGHT || textAlign == CENTER){
+        textAlign = O_LEFT;
+    }
+
+    RenderText(renderer);
+}
+
+void Button::Render(SDL_Renderer* renderer){
+    //Draw background
+    if (state == true){
+        Primitives::FilledRect(renderer, pos, c_Active);
+    } else {
+        Primitives::FilledRect(renderer, pos, c_Back);
+    }
+
+    RenderText(renderer);
+}
+
